@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   title: "User and Group management API"
   contact:
-    email: "computeteam@planet.com"
+    email: "peter.goostree@gmail.com"
 host: "internal.planet.com"
 basePath: "/v2"
 consumes: 
