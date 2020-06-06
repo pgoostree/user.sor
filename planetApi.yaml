@@ -1,0 +1,304 @@
+swagger: "2.0"
+info:
+  description: "This is the User and Group management API." 
+  version: "1.0.0"
+  title: "User and Group management API"
+  contact:
+    email: "computeteam@planet.com"
+host: "internal.planet.com"
+basePath: "/v2"
+consumes: 
+- "application/json"
+produces:
+- "application/json"
+schemes:
+- "https"
+paths:
+  /users/{userId}:
+    get:
+      tags:
+      - "user"
+      summary: "Returns the matching user record"
+      operationId: "getUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "The Id of the user"
+        type: "string"
+        required: true
+      responses:
+        "200":
+          description: "User successfully retrieved"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Temporary server error, try again later"
+    delete:
+      tags:
+      - "user"
+      summary: "Deletes a user record"
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "The userId"
+        type: "string"
+        required: true
+      responses:
+        "200":
+          description: "User successfully deleted"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Temporary server error, try again later"
+    put:
+      tags:
+      - "user"
+      summary: "Updates an existing user record"
+      operationId: "updateUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "The userId"
+        type: "string"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "A user object to update the user record with"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: "User successfully updated"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Temporary server error, try again later"
+  /users:
+    post:
+      tags:
+      - "user"
+      summary: "Creates a new user record"
+      operationId: "createUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Creates a new user record"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: "User successfully added"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "409":
+          description: "User already exists"
+        "500":
+          description: "Temporary server error, try again later"
+  /groups/{groupName}:
+    get:
+      tags:
+      - "group"
+      summary: "Returns a list of userIds in the group"
+      operationId: "getUserGroup"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "groupName"
+        in: "path"
+        description: "The group name"
+        type: "string"
+        required: true
+      responses:
+        "200":
+          description: "Group successfully retrieved"
+          schema:
+            $ref: "#/definitions/Group"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "404":
+          description: "Group not found"
+        "500":
+          description: "Temporary server error, try again later"
+    delete:
+      tags:
+      - "group"
+      summary: "Deletes a group record"
+      operationId: "deleteGroup"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "groupName"
+        in: "path"
+        description: "The group name"
+        type: "string"
+        required: true
+      responses:
+        "200":
+          description: "Group successfully deleted"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "404":
+          description: "Group not found"
+        "500":
+          description: "Temporary server error, try again later"
+    put:
+      tags:
+      - "group"
+      summary: "Updates the membership list of the group"
+      operationId: "updateUserGroup"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "groupName"
+        in: "path"
+        description: "The group name"
+        type: "string"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "A list of userIds"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateGroupRequest"
+      responses:
+        "200":
+          description: "Group successfully updated"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "404":
+          description: "Group not found"
+        "500":
+          description: "Temporary server error, try again later"
+  /groups:
+    post:
+      tags:
+      - "group"
+      summary: "Creates an empty group"
+      operationId: "createGroup"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "A group object to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateGroupRequest"
+      responses:
+        "200":
+          description: "Group successfully created"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Errors"
+        "409":
+          description: "Group already exists"
+        "500":
+          description: "Temporary server error, try again later"
+# securityDefinitions:
+#   Jwt:
+#     description: "Authorization: Bearer token"
+#     type: "apiKey"
+#     name: "Authorization"
+#     in: "header"
+definitions:
+  User:
+    type: "object"
+    description: "User details"
+    properties:
+      userId:
+        type: "string"
+        description: "The users Id"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      groups:
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "admins"
+          - "users"
+          default: "users"
+  Group:
+    type: "object"
+    description: "A list of users in a group"
+    properties:
+      userIds: 
+        type: "array"
+        items:
+          type: "string"
+          description: "A list of userIds in the group"
+  CreateGroupRequest:
+    type: "object"
+    description: "A create group request object"
+    properties: 
+      name:
+        type: "string"
+        description: "The name of the group to be created"
+  UpdateGroupRequest:
+    type: "object"
+    description: "An update group request object"
+    properties:
+      userIds:
+        type: "array"
+        items:
+          type: "string"
+          description: "A list of userIds to be associated to a user group"
+  Errors:
+    type: "array"
+    description: "An array of errors encountered during the request"
+    items:
+      type: "object"
+      description: "Error Info"
+      properties:
+        code:
+          type: "string"
+          description: "error code"
+          example: "INVALID_ARGUMENT"
+        message:
+          type: "string"
+          description: "A message about the error that occurred"
+          example: "The userId was not in the correct format"
