@@ -63,6 +63,7 @@ func main() {
 	router.HandleFunc("/users/{userId}", deleteUser).Methods("DELETE")
 
 	router.HandleFunc("/groups", createGroup).Methods("POST")
+	router.HandleFunc("/groups/{groupName}", getGroup).Methods("GET")
 	router.HandleFunc("/groups/{groupName}", updateGroup).Methods("PUT")
 	router.HandleFunc("/groups/{groupName}", deleteGroup).Methods("DELETE")
 
@@ -92,6 +93,39 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getGroup(w http.ResponseWriter, r *http.Request) {
+	groupName := mux.Vars(r)["groupName"]
+
+	rows, err := db.Query("select * from users.get_user_group('" + groupName + "')")
+	if err != nil {
+		log.Print(err)
+	}
+
+	var userGroup UserGroup
+	defer rows.Close()
+	for rows.Next() {
+		var userID string
+		err = rows.Scan(&userID)
+		if err != nil {
+			log.Print(err)
+			respondWithError(w, http.StatusInternalServerError, "An error occurred, please try again later.")
+		}
+		userGroup.UserIDs = append(userGroup.UserIDs, userID)
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		log.Print(err)
+	}
+
+	if len(userGroup.UserIDs) > 0 {
+		json.NewEncoder(w).Encode(userGroup)
+	} else {
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Either there is no group named %s or there are no users associated with it", groupName))
+	}
+}
+
 func updateGroup(w http.ResponseWriter, r *http.Request) {
 	var userGroup UserGroup
 
@@ -99,15 +133,18 @@ func updateGroup(w http.ResponseWriter, r *http.Request) {
 
 	groupName := mux.Vars(r)["groupName"]
 
-	var result int
-	err := db.QueryRow("INSERT INTO users.user_group (user_id, group_name) VALUES (unnest($1::text[]), $2)", pq.Array(userGroup.UserIDs), groupName).Scan(&result)
+	_, err := db.Exec("DELETE FROM users.user_group")
 	if err != nil {
 		log.Print(err)
-		if strings.Contains(err.Error(), "no rows in result set") {
-			respondWithError(w, http.StatusNotFound, fmt.Sprintf("A group with groupName=%s does not exist", groupName))
+		respondWithError(w, http.StatusInternalServerError, "An error occurred, please try again later.")
+	}
+
+	_, err = db.Exec("INSERT INTO users.user_group (user_id, group_name) VALUES (unnest($1::text[]), $2)", pq.Array(userGroup.UserIDs), groupName)
+	if err != nil {
+		log.Print(err)
+		if strings.Contains(err.Error(), "foreign key constraint") {
+			respondWithError(w, http.StatusNotFound, "Invalid user or group name.")
 		}
-	} else {
-		json.NewEncoder(w).Encode(result)
 	}
 }
 

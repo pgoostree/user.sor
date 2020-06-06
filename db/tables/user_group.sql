@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users.user_group (
-  user_id     text NOT NULL REFERENCES users.user(user_id) ON DELETE CASCADE,
-  group_name  text NOT NULL REFERENCES users.group(group_name) ON DELETE CASCADE,
+  user_id     text REFERENCES users.user ON DELETE CASCADE,
+  group_name  text REFERENCES users.group ON DELETE CASCADE,
   UNIQUE (user_id, group_name)
 );
 
