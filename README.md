@@ -1,7 +1,7 @@
 # User SOR
 
 ## Description
-This is a User and UserGroup management API that provies the following capabilities:
+This is a User and UserGroup management REST API that provides the following capabilities:
 
 ## Users:
 - Add a user 
@@ -81,7 +81,7 @@ curl --location --request GET 'http://localhost:9000/groups/TheDudesTeam'
 
 ### Run the service locally
 
-This service depends on Postgres databse.  By default when running locally in the 
+This service depends on Postgres database.  By default when running locally in the 
 development environment it is configured to connect to Postgres at localhost:5432.
 
 To run the service locally in dev you need to first start the database:
