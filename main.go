@@ -14,8 +14,7 @@ import (
 var db *sql.DB
 
 func main() {
-	db = driver.ConnectDB()
-	defer db.Close()
+	db = driver.Database()
 
 	router := mux.NewRouter()
 

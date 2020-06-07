@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    ports:
+    - "9000:9000"
   postgres:
     image: postgres:latest
     environment:
@@ -13,6 +15,6 @@ services:
       POSTGRES_PASSWORD: postgres
       PG_TRUST_LOCALNET: 1
     ports:
-    - "5436:5432"
+    - "5432:5432"
     volumes:
       - ./db/:/docker-entrypoint-initdb.d
