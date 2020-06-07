@@ -4,43 +4,26 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"time"
 )
 
-const (
-	host     = "postgres"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "user_sor"
-)
+var db *sql.DB
 
-// var db *sql.DB
+func getConnectionString() string {
+	host := os.Getenv("POSTGRES_HOST")
+	port, _ := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	db := os.Getenv("POSTGRES_DB")
 
-// // ConnectDB Creates a postgres db connection
-// func ConnectDB() *sql.DB {
-// 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-// 		host, port, user, password, dbname)
-
-// 	var err error
-// 	db, err = sql.Open("postgres", psqlInfo)
-// 	if err != nil {
-// 		log.Print(err)
-// 	}
-
-// 	err = db.Ping()
-// 	if err != nil {
-// 		log.Print(err)
-// 	}
-
-// 	return db
-// }
-
-var db *sql.DB // this is "internal", as in: we should NOT use this directly
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, db)
+}
 
 func connectToDB() *sql.DB {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	psqlInfo := getConnectionString()
 	conn, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Print(err)
@@ -50,7 +33,8 @@ func connectToDB() *sql.DB {
 	return conn
 }
 
-// Database returns a connection to the db and will rety to connect if it is unable to
+// Database will attempt to connect to postgres db and return a db object on a successfull connection.
+// If the connection to the db is lost it will continually retry to connect until a successful connection can be made.
 func Database() *sql.DB {
 	if db == nil { // during startup - if it does not exist, create it
 		db = connectToDB()
@@ -63,6 +47,7 @@ func Database() *sql.DB {
 		log.Print("Reconnecting...")
 		db = connectToDB()
 		err = db.Ping()
+		log.Print("Connection to Postgres successful.")
 	}
 	return db
 }

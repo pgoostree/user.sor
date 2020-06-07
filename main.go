@@ -8,13 +8,19 @@ import (
 	"user.sor/controllers"
 
 	"github.com/gorilla/mux"
+	"github.com/subosito/gotenv"
 	"user.sor/driver"
 )
 
 var db *sql.DB
 
+func init() {
+	gotenv.Load()
+}
+
 func main() {
 	db = driver.Database()
+	defer db.Close()
 
 	router := mux.NewRouter()
 

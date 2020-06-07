@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    environment:
+      POSTGRES_HOST: postgres
     ports:
     - "9000:9000"
   postgres:
