@@ -15,7 +15,10 @@ var db *sql.DB
 
 func main() {
 	db = driver.ConnectDB()
+	defer db.Close()
+
 	router := mux.NewRouter()
+
 	userController := controllers.UserController{}
 	router.HandleFunc("/users", userController.CreateUser(db)).Methods("POST")
 	router.HandleFunc("/users/{userID}", userController.GetUser(db)).Methods("GET")
