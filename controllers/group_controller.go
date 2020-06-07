@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"strings"
 
+	grouprepository "user.sor/repository/group"
+
 	"github.com/gorilla/mux"
-	"github.com/lib/pq"
 	"user.sor/models"
 	"user.sor/utils"
 )
@@ -29,15 +30,15 @@ func (c GroupController) CreateGroup(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		var result models.Group
-		err := db.QueryRow("select * from users.insert_group('" + group.Name + "')").Scan(&result.Name)
+		groupRepo := grouprepository.GroupRepository{}
+		group, err := groupRepo.InsertGroup(db, group)
+
 		if err != nil {
-			log.Print(err)
 			if strings.Contains(err.Error(), "duplicate key") {
 				utils.RespondWithError(w, http.StatusConflict, fmt.Sprintf("A group with Name=%s already exists", group.Name))
 			}
 		} else {
-			utils.ResponseJSON(w, result)
+			utils.ResponseJSON(w, group)
 		}
 	}
 }
@@ -47,24 +48,9 @@ func (c GroupController) GetGroup(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		groupName := mux.Vars(r)["groupName"]
 
-		rows, err := db.Query("select * from users.get_user_group('" + groupName + "')")
-		if err != nil {
-			log.Print(err)
-		}
+		groupRepo := grouprepository.GroupRepository{}
+		userGroup, err := groupRepo.GetGroup(db, groupName)
 
-		var userGroup models.UserGroup
-		defer rows.Close()
-		for rows.Next() {
-			var userID string
-			err = rows.Scan(&userID)
-			if err != nil {
-				log.Print(err)
-				utils.RespondWithError(w, http.StatusInternalServerError, "An error occurred, please try again later.")
-			}
-			userGroup.UserIDs = append(userGroup.UserIDs, userID)
-		}
-
-		err = rows.Err()
 		if err != nil {
 			log.Print(err)
 		}
@@ -86,15 +72,9 @@ func (c GroupController) UpdateGroup(db *sql.DB) http.HandlerFunc {
 
 		groupName := mux.Vars(r)["groupName"]
 
-		_, err := db.Exec("DELETE FROM users.user_group")
+		groupRepo := grouprepository.GroupRepository{}
+		userGroup, err := groupRepo.UpdateGroup(db, groupName, userGroup)
 		if err != nil {
-			log.Print(err)
-			utils.RespondWithError(w, http.StatusInternalServerError, "An error occurred, please try again later.")
-		}
-
-		_, err = db.Exec("INSERT INTO users.user_group (user_id, group_name) VALUES (unnest($1::text[]), $2)", pq.Array(userGroup.UserIDs), groupName)
-		if err != nil {
-			log.Print(err)
 			if strings.Contains(err.Error(), "foreign key constraint") {
 				utils.RespondWithError(w, http.StatusNotFound, "Invalid user or group name.")
 			}
@@ -107,14 +87,11 @@ func (c GroupController) DeleteGroup(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		groupName := mux.Vars(r)["groupName"]
 
-		var result int
-		err := db.QueryRow("select * from users.delete_group('" + groupName + "')").Scan(&result)
-		if err != nil {
-			log.Print(err)
-		} else {
-			if result == 0 {
-				utils.RespondWithError(w, http.StatusNotFound, fmt.Sprintf("A group with groupName=%s does not exist", groupName))
-			}
+		groupRepo := grouprepository.GroupRepository{}
+		result, _ := groupRepo.DeleteGroup(db, groupName)
+
+		if result == 0 {
+			utils.RespondWithError(w, http.StatusNotFound, fmt.Sprintf("A group with groupName=%s does not exist", groupName))
 		}
 	}
 }
