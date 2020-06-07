@@ -79,10 +79,16 @@ curl --location --request PUT 'http://localhost:9000/groups/TheDudesTeam' \
 curl --location --request GET 'http://localhost:9000/groups/TheDudesTeam'
 ```
 
-### Run the service locally
+## Stop the service
+```bash
+make stop
+```
 
-This service depends on Postgres. By default when running locally in the 
-development environment it is configured to connect to Postgres at localhost:5432.
+### Run the service locally in development environment
+
+This service API is written in Go and the database is Postgres.
+
+By default when running locally in the development environment it is configured to connect to Postgres at localhost:5432.
 
 To run the service locally in dev you need to first start the database:
 
