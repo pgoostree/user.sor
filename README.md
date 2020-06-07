@@ -30,7 +30,7 @@ make integration-tests
 
 ## Run the service
 ```bash
-docker-compose up -d
+make run
 ```
 
 ### Create some users
@@ -62,7 +62,7 @@ curl --location --request POST 'http://localhost:9000/groups' \
 }'
 ```
 
-### Add a user to a group
+### Add users to a group
 ```bash
 curl --location --request PUT 'http://localhost:9000/groups/TheDudesTeam' \
 --header 'Content-Type: application/json' \
@@ -81,7 +81,7 @@ curl --location --request GET 'http://localhost:9000/groups/TheDudesTeam'
 
 ### Run the service locally
 
-This service depends on Postgres database.  By default when running locally in the 
+This service depends on Postgres. By default when running locally in the 
 development environment it is configured to connect to Postgres at localhost:5432.
 
 To run the service locally in dev you need to first start the database:

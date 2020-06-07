@@ -7,4 +7,4 @@ build-docker:
 	docker build -t user.sor .
 
 run:
-	docker-compose up
+	docker-compose up -d
