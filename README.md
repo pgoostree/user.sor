@@ -67,10 +67,7 @@ curl --location --request POST 'http://localhost:9000/groups' \
 curl --location --request PUT 'http://localhost:9000/groups/TheDudesTeam' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-	"user_ids" : [
-		"theDude",
-        "donnie"
-	]
+	"user_ids" : ["theDude", "donnie"]
 }'
 ```
 
