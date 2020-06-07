@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/lib/pq"
+	"user.sor/models"
 )
 
 const (
@@ -19,24 +20,6 @@ const (
 	password = "postgres"
 	dbname   = "user_sor"
 )
-
-type User struct {
-	UserID    string `json:"user_id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-}
-
-type Group struct {
-	Name string `json:"name"`
-}
-
-type UserGroup struct {
-	UserIDs []string `json:"user_ids"`
-}
-
-type Error struct {
-	Message string `json:"message"`
-}
 
 var db *sql.DB
 
@@ -72,7 +55,7 @@ func main() {
 }
 
 func createGroup(w http.ResponseWriter, r *http.Request) {
-	var group Group
+	var group models.Group
 
 	json.NewDecoder(r.Body).Decode(&group)
 
@@ -81,7 +64,7 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result Group
+	var result models.Group
 	err := db.QueryRow("select * from users.insert_group('" + group.Name + "')").Scan(&result.Name)
 	if err != nil {
 		log.Print(err)
@@ -101,7 +84,7 @@ func getGroup(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	var userGroup UserGroup
+	var userGroup models.UserGroup
 	defer rows.Close()
 	for rows.Next() {
 		var userID string
@@ -127,7 +110,7 @@ func getGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateGroup(w http.ResponseWriter, r *http.Request) {
-	var userGroup UserGroup
+	var userGroup models.UserGroup
 
 	json.NewDecoder(r.Body).Decode(&userGroup)
 
@@ -164,7 +147,7 @@ func deleteGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user models.User
 
 	json.NewDecoder(r.Body).Decode(&user)
 
@@ -183,7 +166,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result User
+	var result models.User
 	err := db.QueryRow("select * from users.insert_user('"+user.UserID+"', '"+user.FirstName+"', '"+user.LastName+"')").Scan(&result.UserID, &result.FirstName, &result.LastName)
 	if err != nil {
 		log.Print(err)
@@ -198,7 +181,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 func getUser(w http.ResponseWriter, r *http.Request) {
 	userID := mux.Vars(r)["userId"]
 
-	var result User
+	var result models.User
 	err := db.QueryRow("select * from users.get_user('"+userID+"')").Scan(&result.UserID, &result.FirstName, &result.LastName)
 	if err != nil {
 		log.Print(err)
@@ -211,13 +194,13 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user models.User
 
 	json.NewDecoder(r.Body).Decode(&user)
 
 	userID := mux.Vars(r)["userId"]
 
-	var result User
+	var result models.User
 	err := db.QueryRow("select * from users.update_user('"+userID+"', '"+user.FirstName+"', '"+user.LastName+"')").Scan(&result.UserID, &result.FirstName, &result.LastName)
 	if err != nil {
 		log.Print(err)
@@ -246,5 +229,5 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 func respondWithError(w http.ResponseWriter, status int, message string) {
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(Error{Message: message})
+	json.NewEncoder(w).Encode(models.Error{Message: message})
 }
