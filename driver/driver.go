@@ -36,18 +36,17 @@ func connectToDB() *sql.DB {
 // Database will attempt to connect to postgres db and return a db object on a successfull connection.
 // If the connection to the db is lost it will continually retry to connect until a successful connection can be made.
 func Database() *sql.DB {
-	if db == nil { // during startup - if it does not exist, create it
+	if db == nil {
 		db = connectToDB()
 	}
 	err := db.Ping()
-	for err != nil { // reconnect if we lost connection
+	for err != nil {
 		log.Print("Connection to Postgres was lost. Waiting for 5s...")
 		db.Close()
 		time.Sleep(5 * time.Second)
 		log.Print("Reconnecting...")
 		db = connectToDB()
 		err = db.Ping()
-		log.Print("Connection to Postgres successful.")
 	}
 	return db
 }
