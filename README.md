@@ -70,7 +70,7 @@ curl --location --request PUT 'http://localhost:9000/groups/TheDudesTeam' \
 	"user_ids" : [
         "theDude", 
         "donnie"
-        ]
+    ]
 }'
 ```
 
