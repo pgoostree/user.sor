@@ -41,6 +41,7 @@ func (c UserController) CreateUser(db *sql.DB) http.HandlerFunc {
 
 		userrepo := userrepository.UserRepository{}
 		user, err := userrepo.InsertUser(db, user)
+
 		if err != nil {
 			if strings.Contains(err.Error(), "duplicate key") {
 				utils.RespondWithError(w, http.StatusConflict, fmt.Sprintf("A user with userID=%s already exists", user.UserID))

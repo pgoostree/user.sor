@@ -12,8 +12,8 @@ type UserRepository struct{}
 // InsertUser inserts the user to the db
 func (u UserRepository) InsertUser(db *sql.DB, user models.User) (models.User, error) {
 	var result models.User
-	rows := db.QueryRow("select * from users.insert_user('" + user.UserID + "', '" + user.FirstName + "', '" + user.LastName + "')")
-	err := rows.Scan(&result.UserID, &result.FirstName, &result.LastName)
+	row := db.QueryRow("select * from users.insert_user($1, $2, $3)", user.UserID, user.FirstName, user.LastName)
+	err := row.Scan(&result.UserID, &result.FirstName, &result.LastName)
 
 	if err != nil {
 		log.Print(err)
@@ -26,7 +26,7 @@ func (u UserRepository) InsertUser(db *sql.DB, user models.User) (models.User, e
 // GetUser returns the user from the db given the userID
 func (u UserRepository) GetUser(db *sql.DB, userID string) (models.User, error) {
 	var result models.User
-	err := db.QueryRow("select * from users.get_user('"+userID+"')").Scan(&result.UserID, &result.FirstName, &result.LastName)
+	err := db.QueryRow("select * from users.get_user($1)", userID).Scan(&result.UserID, &result.FirstName, &result.LastName)
 
 	if err != nil {
 		log.Print(err)
@@ -39,7 +39,7 @@ func (u UserRepository) GetUser(db *sql.DB, userID string) (models.User, error) 
 // UpdateUser updates the user in the db
 func (u UserRepository) UpdateUser(db *sql.DB, userID string, user models.User) (models.User, error) {
 	var result models.User
-	err := db.QueryRow("select * from users.update_user('"+userID+"', '"+user.FirstName+"', '"+user.LastName+"')").Scan(&result.UserID, &result.FirstName, &result.LastName)
+	err := db.QueryRow("select * from users.update_user($1, $2, $3)", userID, user.FirstName, user.LastName).Scan(&result.UserID, &result.FirstName, &result.LastName)
 
 	if err != nil {
 		log.Print(err)
@@ -52,7 +52,7 @@ func (u UserRepository) UpdateUser(db *sql.DB, userID string, user models.User) 
 // DeleteUser deletes the user from the db
 func (u UserRepository) DeleteUser(db *sql.DB, userID string) (int, error) {
 	var result int = 0
-	err := db.QueryRow("select * from users.delete_user('" + userID + "')").Scan(&result)
+	err := db.QueryRow("select * from users.delete_user($1)", userID).Scan(&result)
 
 	if err != nil {
 		log.Print(err)
