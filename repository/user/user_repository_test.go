@@ -15,7 +15,7 @@ func TestShouldInsertUser(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"userID", "FirstName", "LastName"}).
+	rows := sqlmock.NewRows([]string{"user_id", "first_name", "last_name"}).
 		AddRow("testId", "testFirstName", "testLastName")
 
 	user := models.User{UserID: "testId", FirstName: "testFirstName", LastName: "testLastName"}

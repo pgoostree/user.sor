@@ -8,12 +8,14 @@ import (
 	"user.sor/models"
 )
 
+// GroupRepository is the DAL for the users schema group table
 type GroupRepository struct{}
 
 // InsertGroup inserts the group to the db
 func (u GroupRepository) InsertGroup(db *sql.DB, group models.Group) (models.Group, error) {
 	var result models.Group
-	err := db.QueryRow("select * from users.insert_group('" + group.Name + "')").Scan(&result.Name)
+	err := db.QueryRow("select * from users.insert_group($1)", group.Name).
+		Scan(&result.Name)
 
 	if err != nil {
 		log.Print(err)
@@ -27,7 +29,7 @@ func (u GroupRepository) InsertGroup(db *sql.DB, group models.Group) (models.Gro
 func (u GroupRepository) GetGroup(db *sql.DB, groupName string) (models.UserGroup, error) {
 	var userGroup models.UserGroup
 
-	rows, err := db.Query("select * from users.get_user_group('" + groupName + "')")
+	rows, err := db.Query("select * from users.get_user_group($1)", groupName)
 
 	if err != nil {
 		log.Print(err)
@@ -72,7 +74,7 @@ func (u GroupRepository) UpdateGroup(db *sql.DB, groupName string, userGroup mod
 // DeleteGroup deletes the group from the db
 func (u GroupRepository) DeleteGroup(db *sql.DB, groupName string) (int, error) {
 	var result int
-	err := db.QueryRow("select * from users.delete_group('" + groupName + "')").Scan(&result)
+	err := db.QueryRow("select * from users.delete_group($1)", groupName).Scan(&result)
 
 	if err != nil {
 		log.Print(err)

@@ -7,6 +7,7 @@ import (
 	"user.sor/models"
 )
 
+// UserRepository is the DAL for the users schema user table
 type UserRepository struct{}
 
 // InsertUser inserts the user to the db
