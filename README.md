@@ -1,7 +1,7 @@
-# User System Of Record (SOR) API
+# User SOR API
 
 ## Description
-This is a User and UserGroup management REST API that provides the following capabilities:
+This is a User and UserGroup System of Record (SOR) REST API that provides the following capabilities:
 
 ## Users:
 - Add a user 
