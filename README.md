@@ -1,4 +1,4 @@
-# User SOR
+# User System of record (SOR)
 
 ## Description
 This is a User and UserGroup management REST API that provides the following capabilities:
