@@ -23,10 +23,6 @@ This is a User and UserGroup System of Record (SOR) REST API that provides the f
 ```bash
 make unit-tests
 ```
-## Run integration tests
-```bash
-make integration-tests
-```
 
 ## Run the service
 ```bash
